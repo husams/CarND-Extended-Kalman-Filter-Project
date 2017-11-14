@@ -21,39 +21,30 @@ void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
 }
 
 void KalmanFilter::Predict() {
-  /**
-  TODO:
-    * predict the state
-  */
+    /**
+     * TODO:
+     *  predict the state
+     */
     x_ = F_ * x_;
     P_ = F_ * P_ * F_.transpose() + Q_;
 }
 
 void KalmanFilter::Update(const VectorXd &z) {
-  /**
-  TODO:
-    * update the state by using Kalman Filter equations
-  */
+    /**
+     * TODO:
+     * update the state by using Kalman Filter equations
+     */
     VectorXd y  = z - H_ * x_;
     
-    MatrixXd Ht = H_.transpose();
-    MatrixXd S  = H_ * P_ * Ht + R_;
-    MatrixXd K  = P_ * Ht * S.inverse();
-    
-    // New estimate
-    long x_size = x_.size();
-    MatrixXd I = MatrixXd::Identity(x_size, x_size);
-    
-    x_ = x_ + (K * y);
-    P_ = (I - K * H_) * P_;
+    commonUpdate(y);
     
 }
 
 void KalmanFilter::UpdateEKF(const VectorXd &z) {
-  /**
-  TODO:
-    * update the state by using Extended Kalman Filter equations
-  */
+    /**
+    * TODO:
+    *   update the state by using Extended Kalman Filter equations
+    */
     double px = x_(0);
     double py = x_(1);
     double vx = x_(2);
@@ -66,15 +57,26 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
     VectorXd h  = VectorXd(3);
     h << rho, theta, rho_dot;
     VectorXd y = z - h;
+
+    // Normalizing Angles
+    while ( y(1) > M_PI || y(1) < -M_PI )
+      y(1) += ((y(1) > M_PI)? -M_PI : M_PI);
+
+    commonUpdate(y);
     
+}
+
+void KalmanFilter::commonUpdate(const Eigen::VectorXd &y)
+{
     MatrixXd Ht = H_.transpose();
     MatrixXd S  = H_ * P_ * Ht + R_;
     MatrixXd K  = P_ * Ht * S.inverse();
     
     // New estimate
+    x_ = x_ + (K * y);
+    
     long x_size = x_.size();
     MatrixXd I = MatrixXd::Identity(x_size, x_size);
     
-    x_ = x_ + (K * y);
     P_ = (I - K * H_) * P_;
 }
