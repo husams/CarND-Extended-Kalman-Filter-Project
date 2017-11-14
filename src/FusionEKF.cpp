@@ -37,7 +37,6 @@ FusionEKF::FusionEKF() {
     * Set the process and measurement noises
     */
     // Initializing P
-    cout << "Initializing P" << endl;
     ekf_.P_ = MatrixXd(4, 4);
     ekf_.P_ << 1, 0, 0,    0,
                0, 1, 0,    0,
@@ -74,8 +73,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
         cout << "EKF : First measurement RADAR" << endl;
       /**
-      Convert radar from polar to cartesian coordinates and initialize state.
-      */
+       * Convert radar from polar to cartesian coordinates and initialize state.
+       */
         double rho     = measurement_pack.raw_measurements_[0]; // range
         double phi     = measurement_pack.raw_measurements_[1];
         double rho_dot = measurement_pack.raw_measurements_[2];
@@ -95,8 +94,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
         cout << "EKF : First measurement LASER" << endl;
       /**
-      Initialize state.
-      */
+       * Initialize state.
+       */
         double x = measurement_pack.raw_measurements_[0];
         double y = measurement_pack.raw_measurements_[1];
         ekf_.x_ << x, y, 0, 0;
